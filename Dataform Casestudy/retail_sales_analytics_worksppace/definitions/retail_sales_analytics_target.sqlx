@@ -1,0 +1,66 @@
+config {
+  type: "incremental",
+  schema: "dataform_poc",
+  name:"retail_sales_analytics",
+  assertions: {
+    nonNull: ["product_id", "product_name"],
+    rowConditions: [
+      'bonus_category is not null'
+    ]
+  },
+  dependencies:["assert_data_types_match","assert_check_clustering_status","assert_check_partitioning_status"],
+  description: "Table provides insights into retail sales, categorizing products by performance and customers by spending behavior.",
+}
+
+WITH 
+-- Subquery to perform any necessary transformations on the staging data
+
+transformed_data AS (
+    SELECT
+        s.product_id,
+        TO_HEX(s.product_name) AS product_name,
+        s.total_sales_amount,
+        s.total_transactions,
+        s.avg_transaction_amount,
+        s.customer_rank,
+        -- Example transformation 1: categorize total sales amount into different ranges
+        CASE
+            WHEN s.total_sales_amount > 10000 THEN 'High Sales'
+            WHEN s.total_sales_amount > 5000 THEN 'Moderate Sales'
+            ELSE 'Low Sales'
+        END AS sales_category,
+        -- Example transformation 2: calculate bonus based on customer rank
+        CASE
+            WHEN s.customer_rank <= 10 THEN 'High Rank Bonus'
+            WHEN s.customer_rank <= 50 THEN 'Medium Rank Bonus'
+            ELSE 'No Bonus'
+        END AS bonus_category,
+        -- Example partition columns
+        s.transaction_date as transaction_date,
+        s.transaction_type as transaction_type,
+        TO_HEX(s.payment_method) as payment_method ,
+        s.transaction_id as transaction_id,
+        s.category as product_category,
+        s.avg_age as customer_age 
+      
+    FROM
+        dataform_poc.retail_sales_analytics_staging s
+   
+)
+SELECT
+    product_id,
+    product_name,
+    total_sales_amount,
+    total_transactions,
+    avg_transaction_amount,
+    customer_rank,
+    sales_category,
+    bonus_category,
+    transaction_date,
+    transaction_type,
+    payment_method,
+    customer_age,
+    product_category
+
+FROM
+    transformed_data

@@ -1,0 +1,43 @@
+config {
+    type: "assertion",
+    name: "assert_check_partitioning_status"
+}
+
+  -- This assertion examines the partitioning status of the "retail_sales_analytics" table within the "dataform_poc" schema of the "project_name" project.
+  -- It determines whether the table is partitioned or not based on the presence of a partitioning field.
+  -- If the table is partitioned, the assertion returns no records, indicating that the partitioning condition is met.
+  --  However, if the table is not partitioned, it returns information about the partitioning status of the table.
+WITH
+  table_info AS (
+  SELECT
+    table_name,
+    MAX(CASE
+        WHEN is_partitioning_column = 'YES' THEN column_name
+    END
+      ) AS partitioning_field,
+  FROM
+    `project_name.dataform_poc.INFORMATION_SCHEMA.COLUMNS`
+  WHERE
+    table_catalog = 'project_name'
+    AND table_schema = 'dataform_poc'
+  GROUP BY
+    table_name ),
+  partitioning_clustering_status_result AS (
+  SELECT
+    table_name,
+    CASE
+      WHEN partitioning_field IS NOT NULL THEN 'Partitioned'
+    ELSE
+    'Not Partitioned'
+  END
+    AS partitioning_clustering_status
+  FROM
+    table_info
+  WHERE
+    table_name = 'retail_sales_analytics' )
+SELECT
+  *
+FROM
+  partitioning_clustering_status_result
+WHERE
+  partitioning_clustering_status != 'Partitioned'

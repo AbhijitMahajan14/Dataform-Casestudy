@@ -1,0 +1,32 @@
+config { type: "assertion",
+name:"assert_check_source_tables_existence" }
+-- This assertion checks for the existence of source tables (customers, products, sales_transactions, and transition) within the project_name.dataform_poc dataset.
+--  It ensures that all required source tables are present before proceeding with data processing or analytics tasks, providing an essential validation step for data pipeline operations.
+--  If any of the specified tables are missing, this assertion will highlight them, indicating potential issues with data availability or schema configuration.
+
+SELECT
+    table_name
+FROM
+    (SELECT
+        'customers' AS table_name
+    UNION ALL
+    SELECT
+        'products' AS table_name
+    UNION ALL
+    SELECT
+        'sales_transactions' AS table_name
+    UNION ALL
+    SELECT
+        'transition' AS table_name) AS source_tables
+WHERE
+    NOT EXISTS (
+        SELECT
+            1
+        FROM
+            `project_name.dataform_poc.INFORMATION_SCHEMA.TABLES` AS target_tables
+        WHERE
+            source_tables.table_name = target_tables.table_name
+            AND table_catalog = 'project_name'
+            AND table_schema = 'dataform_poc'
+            AND table_type = 'BASE TABLE'
+    )

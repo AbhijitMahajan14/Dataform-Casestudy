@@ -1,0 +1,22 @@
+config {
+    type: "assertion",
+    name: "assert_check_fresh_data"
+}
+
+  -- The SQL assertion checks if there's fresh data in a specified BigQuery table.
+  -- If there's no fresh data (defined as data on or before January 1st, 2022),
+  -- it returns all records from the table. If fresh data exists, it returns no records.
+SELECT
+  *
+FROM (
+  SELECT
+    CASE
+      WHEN MAX(transaction_date) > DATE '2022-01-01' THEN 'Fresh data exists'
+    ELSE
+    'No fresh data'
+  END
+    AS data_status
+  FROM
+    `dataform_poc.sales_transactions` )
+WHERE
+  data_status<>'Fresh data exists'

@@ -1,0 +1,63 @@
+config {
+    type: "assertion",
+    name: "assert_data_types_match"
+}
+
+  -- The assert_data_types_match assertion verifies the consistency of data types between the target table retail_sales_analytics and its source tables (customers, products, sales_transactions, and transition).
+  -- It checks for any discrepancies in data types between corresponding columns, alerting to potential inconsistencies in the schema definition. This ensures data integrity and alignment within the Dataform project.
+SELECT
+  tgt.column_name AS target_column,
+  tgt.data_type AS target_data_type,
+  src.table_name AS source_table,
+  src.column_name AS source_column,
+  src.data_type AS source_data_type
+FROM (
+  SELECT
+    column_name,
+    data_type
+  FROM
+    `project_name.dataform_poc.INFORMATION_SCHEMA.COLUMNS`
+  WHERE
+    table_name = 'retail_sales_analytics'
+    -- Target table
+    ) AS tgt
+  LEFT JOIN (
+    SELECT
+      'customers' AS table_name,
+      column_name,
+      data_type
+    FROM
+      `project_name.dataform_poc.INFORMATION_SCHEMA.COLUMNS`
+    WHERE
+      table_name = 'customers'
+    UNION ALL
+    SELECT
+      'products' AS table_name,
+      column_name,
+      data_type
+    FROM
+      `project_name.dataform_poc.INFORMATION_SCHEMA.COLUMNS`
+    WHERE
+      table_name = 'products'
+    UNION ALL
+    SELECT
+      'sales_transactions' AS table_name,
+      column_name,
+      data_type
+    FROM
+      `project_name.dataform_poc.INFORMATION_SCHEMA.COLUMNS`
+    WHERE
+      table_name = 'sales_transactions'
+    UNION ALL
+    SELECT
+      'transition' AS table_name,
+      column_name,
+      data_type
+    FROM
+      `project_name.dataform_poc.INFORMATION_SCHEMA.COLUMNS`
+    WHERE
+      table_name = 'transition' ) AS src
+  ON
+    tgt.column_name = src.column_name
+  WHERE
+    tgt.data_type != src.data_type

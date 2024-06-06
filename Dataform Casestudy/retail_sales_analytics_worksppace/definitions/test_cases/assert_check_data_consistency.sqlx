@@ -1,0 +1,17 @@
+config {
+    type: "assertion",
+    name: "assert_check_data_consistency"
+}
+-- This SQL query retrieves records from the product table when there are inconsistencies in the related customer table. 
+-- If inconsistent data is found, it returns the corresponding records from the product table
+-- ; otherwise, it won't return any records.
+SELECT 
+    p.*
+FROM 
+    `dataform_poc.products` p
+LEFT JOIN 
+    `dataform_poc.customers` c
+ON 
+    p.product_id = c.customer_id
+WHERE 
+    c.customer_id IS NULL OR c.customer_name IS NULL

@@ -1,0 +1,43 @@
+config {
+    type: "assertion",
+    name: "assert_check_clustering_status"
+}
+
+  -- This assertion test case checks the clustering status of the table "retail_sales_analytics" in the "dataform_poc" schema of the "project_nmae" project.
+  -- It verifies if the table is clustered and returns no records if it is not clustered.
+  -- The assertion ensures that the specified table has clustering applied, providing insights into
+  -- the table's data organization for optimized querying performance.
+WITH
+  table_info AS (
+  SELECT
+    table_name,
+    MAX(CASE
+        WHEN clustering_ordinal_position IS NOT NULL THEN column_name
+    END
+      ) AS clustering_field
+  FROM
+    `project_nmae.dataform_poc.INFORMATION_SCHEMA.COLUMNS`
+  WHERE
+    table_catalog = 'project_nmae'
+    AND table_schema = 'dataform_poc'
+  GROUP BY
+    table_name ),
+  partitioning_clustering_status_result AS (
+  SELECT
+    table_name,
+    CASE
+      WHEN clustering_field IS NOT NULL THEN 'Clustered'
+    ELSE
+    'Not Clustered'
+  END
+    AS partitioning_clustering_status
+  FROM
+    table_info
+  WHERE
+    table_name = 'retail_sales_analytics' )
+SELECT
+  *
+FROM
+  partitioning_clustering_status_result
+WHERE
+  partitioning_clustering_status != 'Clustered'

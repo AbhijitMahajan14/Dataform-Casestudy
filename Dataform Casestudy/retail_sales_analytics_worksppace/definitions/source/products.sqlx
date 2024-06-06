@@ -1,0 +1,6 @@
+config {
+  type: "declaration",
+  database: "add_project_here",
+  schema: "dataform_poc",
+  name: "products",
+}

@@ -1,4 +1,5 @@
-#Dataform Case Study
+# Dataform Case Study
+
 **Introduction**
 This repository contains a case study that demonstrates the use of Dataform for building a retail sales analytics workspace. The project showcases various SQL scripts and configurations necessary for processing and analyzing retail sales data.
 

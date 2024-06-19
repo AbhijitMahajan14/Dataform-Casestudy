@@ -32,5 +32,7 @@ Contributions are welcome! Feel free to fork the repository, make changes, and s
 **Contact**
 
 Feel free to reach out if you have any questions or suggestions!
+
 GitHub: @AbhijiMahajan14
+
 Email: abhijitmahajan772@gmail.com
